@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 app.use(express.urlencoded({ extended: true }));
+app.set("view engine", "ejs");
 const mongoose = require("mongoose");
 const mongodb =
   "mongodb+srv://ujjwal_1908:ujjwal1234@cluster0.ghr9l.mongodb.net/task-database?retryWrites=true&w=majority";
@@ -13,8 +14,6 @@ mongoose
   .catch((err) => console.log(err));
 
 const Task = require("./models/tasks");
-
-app.set("view engine", "ejs");
 
 app.get("/", (req, res) => {
   // res.render("index");
@@ -46,6 +45,20 @@ app.post("/tasks", (req, res) => {
       res.redirect("/get-tasks");
     })
     .catch((err) => console.group(err));
+});
+
+app.delete("/tasks/:id", (req, res) => {
+  const id = req.params.id;
+  Task.findByIdAndDelete(id).then((result) => {
+    res.json({ redirect: "/get-tasks" });
+  });
+});
+
+app.put("/update/:id", (req, res) => {
+  const id = req.params.id;
+  Task.findByIdAndUpdate(id, req.body).then((result) => {
+    res.json({ msg: "Updated Successfully!" });
+  });
 });
 
 app.use((req, res) => {
